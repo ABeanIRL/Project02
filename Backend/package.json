@@ -4,8 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "client": "cd ../Frontend && npm run dev",
+    "server": "nodemon index.js --ignore client",
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
     "start": "node index.js"
   },
   "keywords": [],
@@ -15,6 +16,7 @@
   "dependencies": {
     "@eslint/plugin-kit": "^0.2.3",
     "bcrypt": "^5.1.1",
+    "concurrently": "^9.1.0",
     "cors": "^2.8.5",
     "cross-spawn": "^7.0.6",
     "dotenv": "^16.4.5",
