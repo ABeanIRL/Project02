@@ -1,0 +1,36 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "client": "cd ../Frontend && npm run dev",
+    "server": "nodemon index.js --ignore client",
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@eslint/plugin-kit": "^0.2.3",
+    "bcrypt": "^5.1.1",
+    "concurrently": "^9.1.0",
+    "cors": "^2.8.5",
+    "cross-spawn": "^7.0.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.0",
+    "mongoose": "^8.8.0",
+    "multer": "^1.4.5-lts.1",
+    "server": "file:"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0",
+    "nodemon": "^3.1.7"
+  }
+}
