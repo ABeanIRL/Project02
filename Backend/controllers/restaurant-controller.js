@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import validator from "express-validator";
+import mongoose from "mongoose";
 import { Order } from "../models/order.js";
 import { MenuItem } from "../models/menu-item.js";
 import { Customer } from "../models/customer.js";
@@ -143,7 +144,15 @@ export const getMenu = async (req, res, next) => {
 
 export const createOrder = async (req, res, next) => {
   try {
-    const order = Order({ ...req.body });
+    const { customerId, firstName, lastName, deliveryAddress, items } =
+      req.body;
+    const order = Order({
+      customerId: mongoose.Types.ObjectId(customerId),
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      deliveryAddress: deliveryAddress.trim(),
+      items: JSON.parse(items),
+    });
     await order.save();
     if (!order) {
       throw new HttpException();

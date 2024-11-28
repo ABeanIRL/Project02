@@ -25,7 +25,7 @@ const Login = () => {
       });
 
       if (response.ok) {
-        const data = response.json();
+        const data = await response.json();
         // save to reducer
         navigate("/restaurant");
       }
