@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { menuItemSchema } from "./menu-item.js";
 import { ORDER_STATUS } from "../constants/constant.js";
 
 const orderItemSchema = new mongoose.Schema(
   {
     menuItem: {
-      type: menuItemSchema,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MenuItem",
       required: true,
     },
     quantity: {
