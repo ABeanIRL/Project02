@@ -9,6 +9,21 @@ import { styled } from '@mui/system';
 import PropTypes from "prop-types";
 //import { styled } from '@mui/system';
 
+const dummyUser = {
+    "success": true,
+    "code": 200,
+    "message": "User returned successfully",
+    "data": {
+        "_id": "67466dc0b19bf590cf17fdbf",
+        "email": "jupiter@gmail.com",
+        "username": "jupiter",
+        "firstName": "Jupiter",
+        "lastName": "Patel",
+        "address": "238 Country RD 10",
+        "__v": 0
+    }
+}
+
 const NumberInput = forwardRef(function CustomNumberInput(props, ref) {
   const [value, setValue] = useState(0);
 
@@ -60,12 +75,36 @@ const Menu = () => {
     }));
   };
 
-  //this is the handlesubmit i want you to change copilot
   const handleSubmit = () => {
-    items.forEach((item) => {
-      const quantity = quantities[item._id] || 0;
-      console.log(`Item: ${item.name}, Quantity: ${quantity}`);
-    });
+    const orderItems = items.map((item) => ({
+      menuItem: item._id,
+      quantity: quantities[item._id] || 0,
+    })).filter(item => item.quantity > 0);
+  
+    const orderData = {
+      customerId: dummyUser.data._id,
+      firstName: dummyUser.data.firstName,
+      lastName: dummyUser.data.lastName,
+      deliveryAddress: dummyUser.data.address,
+      items: orderItems,
+    };
+    console.log(JSON.stringify(orderData))
+    fetch("http://localhost:3000/restaurant/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderData),
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.success) {
+          console.log("Order created successfully:", response.data);
+        } else {
+          console.error("Failed to create order:", response.message);
+        }
+      })
+      .catch((err) => console.error("Error:", err));
   };
 
   const MenuList = ({ menuItems }) => {
