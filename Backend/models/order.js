@@ -1,6 +1,21 @@
 import mongoose from "mongoose";
-import { menuItemSchema } from "./menu-item.js";
 import { ORDER_STATUS } from "../constants/constant.js";
+
+const orderItemSchema = new mongoose.Schema(
+  {
+    menuItem: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MenuItem",
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+  },
+  { _id: false }
+);
 
 const orderSchema = new mongoose.Schema(
   {
@@ -21,7 +36,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    items: [menuItemSchema],
+    items: [orderItemSchema],
     status: {
       type: String,
       enum: Object.values(ORDER_STATUS),

@@ -60,6 +60,7 @@ const Menu = () => {
     }));
   };
 
+  //this is the handlesubmit i want you to change copilot
   const handleSubmit = () => {
     items.forEach((item) => {
       const quantity = quantities[item._id] || 0;
