@@ -4,7 +4,7 @@ import ListItem from "@mui/material/ListItem";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-const MenuList = ({ menuItems }) => {
+const HomepageMenuList = ({ menuItems }) => {
     return (
         <Box
             sx={{
@@ -47,7 +47,7 @@ const MenuList = ({ menuItems }) => {
     );
 }
 
-MenuList.propTypes = {
+HomepageMenuList.propTypes = {
     menuItems: PropTypes.arrayOf(
         PropTypes.shape({
             _id: PropTypes.string.isRequired,
@@ -58,4 +58,4 @@ MenuList.propTypes = {
     ).isRequired,
 }
 
-export default MenuList;
+export default HomepageMenuList;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MenuList from "../components/MenuList";
+import HomepageMenuList from "../../components/HomepageMenuList";
 import RestaurantHeader from "../../components/RestaurantHeader";
 
 const Menu = () => {
@@ -17,7 +17,7 @@ const Menu = () => {
     return (
         <>
             <RestaurantHeader />
-            <MenuList menuItems={items} />
+            <HomepageMenuList menuItems={items} />
         </>
     );
 }
