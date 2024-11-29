@@ -16,7 +16,7 @@ const Register = () => {
     if (!validateInputs()) {
       return;
     }
-
+//wapofafpoi
     try {
       const response = await fetch(
         "http://localhost:3000/restaurant/register",
