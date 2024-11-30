@@ -5,9 +5,9 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
+  const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
   const handleSubmit = async (event) => {
@@ -36,7 +36,8 @@ const Login = () => {
 
   const validateInputs = () => {
     let isValid = true;
-    if (!email || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !(/\S+@\S+\.\S+/.test(email))) {
+      console.log(email, /\S+@\S+\.\S+/.test(email));
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
       isValid = false;

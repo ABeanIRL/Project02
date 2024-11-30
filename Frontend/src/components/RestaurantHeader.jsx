@@ -39,6 +39,9 @@ const RestaurantHeader = () => {
         >
           Gustosa
         </Typography>
+        <Button color="inherit" href="/restaurant/register">
+        Register
+        </Button>
         <Button color="inherit" href="/restaurant/login">
           Login
         </Button>
