@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCustomer } from "../../slice/customerSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -25,8 +28,8 @@ const Login = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        // save to reducer
+        const res = await response.json();
+        dispatch(setCustomer(res.data));
         navigate("/restaurant");
       }
     } catch (error) {
@@ -36,7 +39,7 @@ const Login = () => {
 
   const validateInputs = () => {
     let isValid = true;
-    if (!email || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage("Please enter a valid email address.");
       isValid = false;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCustomer } from "../../slice/customerSlice";
 import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
@@ -7,8 +9,11 @@ import Button from "@mui/material/Button";
 import Toolbar from "@mui/material/Toolbar";
 import MenuList from "../../components/MenuList";
 
-const Menu = () => {
+const RestaurantHome = () => {
+  const user = useSelector((state) => state.customer.value);
+  const dispatch = useDispatch();
   const [items, setItems] = useState([]);
+  console.log(user);
 
   useEffect(() => {
     fetch("http://localhost:3000/restaurant")
@@ -43,4 +48,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default RestaurantHome;
