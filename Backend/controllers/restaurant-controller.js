@@ -175,8 +175,9 @@ export const createOrder = async (req, res, next) => {
 export const getOrderStatus = async (req, res, next) => {
   try {
     const { orderId } = req.body;
+    console.log(orderId);
     const order = await Order.find({ _id: orderId }).exec();
-
+    console.log(order);
     if (!order) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.NOT_FOUND,

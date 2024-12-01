@@ -5,8 +5,10 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import PropTypes from "prop-types";
 
 const OrderTable = ({ orders }) => {
+  return(
   <TableContainer component={Paper}>
     <Table>
       <TableHead>
@@ -35,7 +37,20 @@ const OrderTable = ({ orders }) => {
         ))}
       </TableBody>
     </Table>
-  </TableContainer>;
+  </TableContainer>
+)};
+
+// PropTypes validation
+OrderTable.propTypes = {
+  orders: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      address: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+      driver: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default OrderTable;

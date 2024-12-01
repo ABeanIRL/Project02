@@ -1,4 +1,6 @@
 import RestaurantHeader from "../../components/RestaurantHeader";
+import RestaurantFooter from "../../components/RestaurantFooter";
+
 import { useState, useEffect, forwardRef } from "react";
 import { Box, List, ListItem, Typography } from "@mui/material/";
 import {
@@ -7,53 +9,6 @@ import {
 } from '@mui/base/Unstable_NumberInput';
 import { styled } from '@mui/system';
 import PropTypes from "prop-types";
-//import { styled } from '@mui/system';
-
-const dummyUser = {
-    "success": true,
-    "code": 200,
-    "message": "User returned successfully",
-    "data": {
-        "_id": "67466dc0b19bf590cf17fdbf",
-        "email": "jupiter@gmail.com",
-        "username": "jupiter",
-        "firstName": "Jupiter",
-        "lastName": "Patel",
-        "address": "238 Country RD 10",
-        "__v": 0
-    }
-}
-
-const NumberInput = forwardRef(function CustomNumberInput(props, ref) {
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event, val) => {
-    setValue(val);
-  };
-
-  return (
-    <BaseNumberInput
-      slots={{
-        root: StyledInputRoot,
-        input: StyledInputElement,
-        incrementButton: StyledButton,
-        decrementButton: StyledButton,
-      }}
-      slotProps={{
-        incrementButton: {
-          children: '▴',
-        },
-        decrementButton: {
-          children: '▾',
-        },
-      }}
-      value={value}
-      onChange={handleChange}
-      {...props}
-      ref={ref}
-    />
-  );
-});
 
 const Menu = () => {
   const [items, setItems] = useState([]);
@@ -81,6 +36,21 @@ const Menu = () => {
       quantity: quantities[item._id] || 0,
     })).filter(item => item.quantity > 0);
   
+const dummyUser = {
+  "success": true,
+  "code": 200,
+  "message": "User returned successfully",
+  "data": {
+      "_id": "67466dc0b19bf590cf17fdbf",
+      "email": "jupiter@gmail.com",
+      "username": "jupiter",
+      "firstName": "Jupiter",
+      "lastName": "Patel",
+      "address": "238 Country RD 10",
+      "__v": 0
+  }
+}
+
     const orderData = {
       customerId: dummyUser.data._id,
       firstName: dummyUser.data.firstName,
@@ -110,61 +80,111 @@ const Menu = () => {
   const MenuList = ({ menuItems }) => {
     return (
       <Box
+      sx={{
+        width: "70%",
+        marginX: "auto", // Horizontal margin
+        marginY: "64px", // Vertical margin
+        padding: "32px",
+        backgroundColor: "#fff8f0",
+        borderRadius: "16px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        border: "1px solid #e0a899",
+      }}
+      >
+      <Typography
+        variant="h4"
         sx={{
-          width: "60%",
-          padding: "64px",
-          display: "flex",
-          justifyContent: "center",
-          height: "100vh",
-          marginTop: "128px",
+        textAlign: "center",
+        marginBottom: "24px",
+        color: "#8b0000",
+        fontFamily: "Georgia, serif",
         }}
       >
-        <List>
-          {menuItems &&
-            menuItems.map((item) => {
-              return (
-                <ListItem
-                  key={item._id}
-                  sx={{
-                    borderBottom: "1px solid rgb(0, 0, 0, 0.2)",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "100%",
-                    }}
-                  >
-                    <Typography variant="h6">{item.name}</Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      {item.description}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ marginTop: "8px", fontWeight: "bold" }}
-                    >
-                      ${item.price}
-                    </Typography>
-                    <NumberInput
-                      aria-label="Demo number input"
-                      placeholder="How many do you want?"
-                      value={quantities[item._id] || 0}
-                      onChange={(event, value) => handleQuantityChange(item._id, value)}
-                    />
-                  </Box>
-                </ListItem>
-              );
-            })}
-        </List>
-        <button onClick={handleSubmit}>Submit Order</button>
+        Select Your Favorite Dishes
+      </Typography>
+      <List>
+        {menuItems &&
+        menuItems.map((item) => (
+          <ListItem
+          key={item._id}
+          sx={{
+            borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+            padding: "16px",
+          }}
+          >
+          <Box
+            sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            }}
+          >
+            <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bold",
+              color: "#8b0000",
+              marginBottom: "8px",
+            }}
+            >
+            {item.name}
+            </Typography>
+            <Typography
+            variant="body2"
+            sx={{
+              fontStyle: "italic",
+              color: "#555",
+              marginBottom: "8px",
+            }}
+            >
+            {item.description}
+            </Typography>
+            <Typography
+            variant="body1"
+            sx={{
+              fontWeight: "bold",
+              color: "#8b0000",
+              marginBottom: "8px",
+            }}
+            >
+            ${item.price}
+            </Typography>
+            <NumberInput
+            aria-label="Quantity"
+            placeholder="How many?"
+            value={quantities[item._id] || 0}
+            onChange={(event, value) =>
+              handleQuantityChange(item._id, value)
+            }
+            />
+          </Box>
+          </ListItem>
+        ))}
+      </List>
+      <Box sx={{ textAlign: "center", marginTop: "32px" }}>
+        <button
+        onClick={handleSubmit}
+        style={{
+          backgroundColor: "#8b0000",
+          color: "white",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          border: "none",
+          fontSize: "16px",
+          cursor: "pointer",
+          transition: "background-color 0.3s",
+        }}
+        onMouseOver={(e) => (e.target.style.backgroundColor = "#a81111")}
+        onMouseOut={(e) => (e.target.style.backgroundColor = "#8b0000")}
+        >
+        Submit Order
+        </button>
       </Box>
+      </Box>
+      
     );
   };
-
+  
   MenuList.propTypes = {
     menuItems: PropTypes.arrayOf(
       PropTypes.shape({
@@ -175,14 +195,52 @@ const Menu = () => {
       })
     ).isRequired,
   };
-
   return (
     <div>
-      <RestaurantHeader />
-      <MenuList menuItems={items} />
+      <div style={{ position: "fixed", top: 0, width: "100%", zIndex: 1000 }}>
+        <RestaurantHeader />
+      </div>
+      <div style={{ paddingTop: "64px" }}>
+        <MenuList menuItems={items} />
+      </div>
+      <div>
+        <RestaurantFooter />
+      </div>
     </div>
   );
 };
+
+const NumberInput = forwardRef(function CustomNumberInput(props, ref) {
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, val) => {
+    setValue(val);
+  };
+
+  
+  return (
+    <BaseNumberInput
+      slots={{
+        root: StyledInputRoot,
+        input: StyledInputElement,
+        incrementButton: StyledButton,
+        decrementButton: StyledButton,
+      }}
+      slotProps={{
+        incrementButton: {
+          children: '▴',
+        },
+        decrementButton: {
+          children: '▾',
+        },
+      }}
+      value={value}
+      onChange={handleChange}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 const blue = {
   100: '#DAECFF',

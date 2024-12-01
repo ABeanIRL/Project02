@@ -35,7 +35,7 @@ const RestaurantHeader = () => {
         <Typography
           variant="h2"
           component="div"
-          sx={{ flexGrow: 1, fontFamily: "Veranda" }}
+          sx={{ flexGrow: 1, fontFamily: "Courier" }}
         >
           Gustosa
         </Typography>
