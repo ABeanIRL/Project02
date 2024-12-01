@@ -9,7 +9,12 @@ import {
   logout,
   authenticate,
 } from "../controllers/restaurant-controller.js";
-import { customerLogin, customerRegister } from "../middlewares/customer-validation.js";
+import {
+  customerLogin,
+  customerRegister,
+  customerOrder,
+  customerOrderStatus
+} from "../middlewares/customer-validation.js";
 
 const router = express.Router();
 
@@ -21,9 +26,9 @@ router.post("/register", customerRegister, register);
 
 router.post("/logout", logout);
 
-router.post("/order/status", authenticate, getOrderStatus);
+router.post("/order/status", customerOrderStatus, getOrderStatus);
 
-router.post("/order", authenticate, createOrder);
+router.post("/order", customerOrder, authenticate, createOrder);
 
 router.get("/orders", getOrdersByCustomer);
 

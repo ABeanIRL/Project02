@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import validator from "express-validator";
-import mongoose from "mongoose";
 import { Order } from "../models/order.js";
 import { MenuItem } from "../models/menu-item.js";
 import { Customer } from "../models/customer.js";
@@ -147,7 +146,7 @@ export const createOrder = async (req, res, next) => {
     const { customerId, firstName, lastName, deliveryAddress, items } =
       req.body;
     const order = Order({
-      customerId: mongoose.Types.ObjectId(customerId),
+      customerId: customerId.trim(),
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       deliveryAddress: deliveryAddress.trim(),

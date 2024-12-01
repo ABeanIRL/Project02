@@ -10,9 +10,10 @@ const TrackingHome = () => {
         const response = await fetch("http://localhost:3000/tracking/orders");
         if (response.ok) {
           const res = await response.json();
+          console.log(res.data);
           setOrders(res.data);
         } else {
-            console.error(response.error);
+          console.error(response.error);
         }
       } catch (error) {
         console.error(error);
@@ -22,7 +23,9 @@ const TrackingHome = () => {
   }, []);
 
   return (
-    <OrderTable orders={orders} />
+    <div>
+      <OrderTable orders={orders}></OrderTable>
+    </div>
   );
 };
 

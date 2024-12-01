@@ -27,16 +27,26 @@ const orderSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
+      maxLength: 50,
     },
     lastName: {
       type: String,
       required: true,
+      maxLength: 50,
     },
     deliveryAddress: {
       type: String,
       required: true,
+      maxLength: 255,
     },
-    items: [orderItemSchema],
+    items: {
+      type: [orderItemSchema],
+      required: true,
+      validate: {
+        validator: (v) => v.length > 0,
+        message: "An order must have at least one item.",
+      },
+    },
     status: {
       type: String,
       enum: Object.values(ORDER_STATUS),

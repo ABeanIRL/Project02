@@ -33,6 +33,7 @@ export const HTTP_RESPONSE_CODE = {
     menuNotFound: "No menu items found",
     invalidCredentials: "Invalid user email or password",
     invalidEmail: "Enter a valid email address",
+    invalidCustomerId: "No user with this ID found",
     invalidRequest: "Request body could not be read properly",
   };
 
