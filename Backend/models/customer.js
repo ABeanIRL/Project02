@@ -23,16 +23,19 @@ const customerSchema = mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    maxLength: 50,
   },
   lastName: {
     type: String,
     required: true,
     trim: true,
+    maxLength: 50,
   },
   address: {
     type: String,
     required: true,
     trim: true,
+    maxLength: 255,
   },
 });
 

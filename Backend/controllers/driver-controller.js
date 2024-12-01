@@ -38,6 +38,7 @@ export const register = async (req, res, next) => {
 
     const {
       username,
+      email,
       password,
       firstName,
       lastName,
@@ -48,6 +49,7 @@ export const register = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const driver = Driver({
       username: username.trim(),
+      email: email.trim(),
       password: hashedPassword,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -56,7 +58,7 @@ export const register = async (req, res, next) => {
       licensePlate: licensePlate && licensePlate.trim(),
     });
     await driver.save();
-    
+
     if (!driver) {
       throw new HttpException();
     }
@@ -87,11 +89,8 @@ export const login = async (req, res, next) => {
       );
     }
 
-    const { username, password } = req.body;
-    const isEmail = validator.isEmail(username);
-    const driver = await Driver.findOne(
-      isEmail ? { email: username } : { username: username }
-    ).exec();
+    const { email, password } = req.body;
+    const driver = await Driver.findOne({ email }).exec();
     const match = await bcrypt.compare(password, driver.password);
     if (!match) {
       throw new HttpException(

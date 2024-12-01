@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import debounce from "lodash/debounce.js";
 import OrderTable from "./OrderTable";
 import SearchAppBar from "./SearchAppBar";
 import Box from "@mui/material/Box";
@@ -9,6 +10,25 @@ const TrackingHome = () => {
   const [transitOrders, setTransitOrders] = useState([]);
   const [deliveredOrders, setDeliveredOrders] = useState([]);
   const [cancelledOrders, setCancelledOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = useMemo(() => {
+    debounce((query) => {
+        fetch()
+    });
+  }, []);
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchTerm(query);
+    handleSearch(query);
+  };
+
+  useEffect(() => {
+    return () => {
+      handleSearch.cancel();
+    };
+  }, [handleSearch]);
 
   useEffect(() => {
     const fetchOrders = async (status, setState) => {
@@ -39,7 +59,7 @@ const TrackingHome = () => {
 
   return (
     <>
-      <SearchAppBar />
+      <SearchAppBar searchTerm={searchTerm} handleSearchChange={handleSearchChange} />
       <Container>
         <Box sx={{ "&>*": { mb: 6, mt: 6 } }}>
           <OrderTable
