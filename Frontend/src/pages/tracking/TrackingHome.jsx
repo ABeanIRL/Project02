@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce.js"
 import OrderTable from "./OrderTable";
-import SearchAppBar from "./SearchAppBar";
+import SearchAppBar from "../../components/SearchAppBar";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
