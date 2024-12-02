@@ -7,9 +7,74 @@ import {
 import { HttpException } from "../exceptions/exceptions.js";
 import { RequestValidation } from "../utils/request-validator.js";
 
-export const getOrders = async (req, res, next) => {
+export const getReadyOrders = async (req, res, next) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 }).exec();
+    const orders = await Order.find({ status: ORDER_STATUS.ready })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    return res
+      .status(HTTP_RESPONSE_CODE.SUCCESS)
+      .send(
+        RequestValidation.createAPIResponse(
+          true,
+          HTTP_RESPONSE_CODE.SUCCESS,
+          APP_ERROR_MESSAGE.ordersReturned,
+          orders
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransitOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ status: ORDER_STATUS.transit })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    return res
+      .status(HTTP_RESPONSE_CODE.SUCCESS)
+      .send(
+        RequestValidation.createAPIResponse(
+          true,
+          HTTP_RESPONSE_CODE.SUCCESS,
+          APP_ERROR_MESSAGE.ordersReturned,
+          orders
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDeliveredOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ status: ORDER_STATUS.delivered })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    return res
+      .status(HTTP_RESPONSE_CODE.SUCCESS)
+      .send(
+        RequestValidation.createAPIResponse(
+          true,
+          HTTP_RESPONSE_CODE.SUCCESS,
+          APP_ERROR_MESSAGE.ordersReturned,
+          orders
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCancelledOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ status: ORDER_STATUS.cancelled })
+      .sort({ createdAt: -1 })
+      .exec();
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
@@ -32,7 +97,7 @@ export const getOrdersByCustomer = async (req, res, next) => {
     if (!customerId) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
-        APP_ERROR_MESSAGE.invalidRequest
+        APP_ERROR_MESSAGE.invalidCustomerId
       );
     }
 
@@ -63,18 +128,27 @@ export const cancelOrder = async (req, res, next) => {
       );
     }
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      { _id: orderId },
-      { status: ORDER_STATUS.cancelled },
-      { new: true }
-    ).exec();
+    const order = await Order.findById(orderId).exec();
 
-    if (!updatedOrder) {
+    if (!order) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.NOT_FOUND,
         APP_ERROR_MESSAGE.orderNotFound
       );
     }
+
+    if (
+      order.status === ORDER_STATUS.delivered ||
+      order.status === ORDER_STATUS.cancelled
+    ) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        `Orders with status '${order.status}' cannot be canceled.`
+      );
+    }
+
+    order.status = ORDER_STATUS.cancelled;
+    const updatedOrder = await order.save();
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
