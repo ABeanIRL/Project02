@@ -12,6 +12,9 @@ import OrderUpdatePage from "./pages/tracking/OrderUpdatePage";
 import MyOrdersPage from "./pages/driver/MyOrdersPage";
 import FulfillmentPage from "./pages/driver/FulfillmentPage";
 
+import OrderUpdatePage from "./pages/tracking/OrderUpdatePage";
+import MyOrdersPage from "./pages/driver/MyOrdersPage";
+import FulfillmentPage from "./pages/driver/FulfillmentPage";
 
 const App = () => {
   return (
