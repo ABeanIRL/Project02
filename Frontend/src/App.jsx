@@ -12,10 +12,6 @@ import OrderUpdatePage from "./pages/tracking/OrderUpdatePage";
 import MyOrdersPage from "./pages/driver/MyOrdersPage";
 import FulfillmentPage from "./pages/driver/FulfillmentPage";
 
-import OrderUpdatePage from "./pages/tracking/OrderUpdatePage";
-import MyOrdersPage from "./pages/driver/MyOrdersPage";
-import FulfillmentPage from "./pages/driver/FulfillmentPage";
-
 const App = () => {
   return (
     <BrowserRouter>
@@ -26,8 +22,6 @@ const App = () => {
           <Route path="register" element={<RestaurantRegister />} />
           <Route path="order" element={<NewOrder />} />
           <Route path="myOrders" element={<MyOrders />} />
-        </Route>
-        <Route path="/tracking" element={<TrackingHome />} />
         </Route>
         <Route path="/driver">
           <Route index element={<DriverHome />} />
