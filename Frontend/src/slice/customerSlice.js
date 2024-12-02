@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const customerSlice = createSlice({
   name: "customer",
   initialState: {
-    value: {},
+    value: null,
   },
   reducers: {
     setCustomer: (state, action) => {
@@ -13,7 +13,7 @@ export const customerSlice = createSlice({
       state.value = { ...state.value, ...action.payload };
     },
     clearCustomer: (state) => {
-      state.value = {};
+      state.value = null;
     },
   },
 });
