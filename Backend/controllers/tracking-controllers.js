@@ -7,6 +7,9 @@ import {
 import { HttpException } from "../exceptions/exceptions.js";
 import { RequestValidation } from "../utils/request-validator.js";
 import mongoose from "mongoose";
+import { BUCKET_NAME, s3 } from "../config/AWS-S3-config.js";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { streamToBase64 } from "../utils/converter.js";
 
 export const getReadyOrders = async (req, res, next) => {
   try {
@@ -19,9 +22,7 @@ export const getReadyOrders = async (req, res, next) => {
       .exec();
 
     const ordersWithTotals = orders.map((order) => {
-      const total = order.items.reduce((sum, item) => {
-        return sum + (item?.menuItem?.price || 0) * item.quantity;
-      }, 0);
+      const total = order.total;
       return {
         ...order.toObject(),
         total,
@@ -54,9 +55,7 @@ export const getTransitOrders = async (req, res, next) => {
       .exec();
 
     const ordersWithTotals = orders.map((order) => {
-      const total = order.items.reduce((sum, item) => {
-        return sum + (item?.menuItem?.price || 0) * item.quantity;
-      }, 0);
+      const total = order.total;
       return {
         ...order.toObject(),
         total,
@@ -88,15 +87,25 @@ export const getDeliveredOrders = async (req, res, next) => {
       .sort({ createdAt: -1 })
       .exec();
 
-    const ordersWithTotals = orders.map((order) => {
-      const total = order.items.reduce((sum, item) => {
-        return sum + (item?.menuItem?.price || 0) * item.quantity;
-      }, 0);
-      return {
-        ...order.toObject(),
-        total,
-      };
-    });
+    const ordersWithTotals = await Promise.all(
+      orders.map(async (order) => {
+        const params = {
+          Bucket: BUCKET_NAME,
+          Key: order.image,
+        };
+
+        const command = new GetObjectCommand(params);
+        const data = await s3.send(command);
+        const content = await streamToBase64(data.Body);
+        const total = order.total;
+
+        return {
+          ...order.toObject(),
+          imageData: content,
+          total,
+        };
+      })
+    );
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
@@ -283,9 +292,7 @@ export const cancelOrder = async (req, res, next) => {
 
     order.status = ORDER_STATUS.cancelled;
     const updatedOrder = await order.save();
-    const total = order.items.reduce((sum, item) => {
-      return sum + (item?.menuItem?.price || 0) * item.quantity;
-    }, 0);
+    const total = order.total;
     const updatedOrderWithTotal = {
       ...updatedOrder.toObject(),
       total,

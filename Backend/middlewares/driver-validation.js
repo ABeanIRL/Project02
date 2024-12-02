@@ -5,7 +5,7 @@ import {
   HTTP_RESPONSE_CODE,
   APP_ERROR_MESSAGE,
 } from "../constants/constant.js";
-const { check } = validator;
+const { check, body } = validator;
 
 export const driverRegister = [
   check("username")
@@ -56,3 +56,19 @@ export const driverLogin = [
   check("email").isEmail().withMessage("Invalid email address."),
   check("password").exists().withMessage("Incorrect password"),
 ];
+
+export const driverComplete = [
+  body('image').custom((value, { req }) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!req.file) {
+      throw new Error('Image is required');
+    }
+
+    const fileMimeType = req.file.mimetype;
+    if (!allowedMimeTypes.includes(fileMimeType)) {
+      throw new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed');
+    }
+
+    return true;
+  })
+]

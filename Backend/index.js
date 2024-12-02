@@ -26,13 +26,13 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
-    session({
-      secret: process.env.TOKEN_SECRET,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { maxAge: 60 * 60 * 100 * 1000 }
-    })
-  );
+  session({
+    secret: process.env.TOKEN_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60 * 60 * 100 * 1000 },
+  })
+);
 
 app.use("/driver", driverRoutes);
 app.use("/restaurant", restaurantRoutes);

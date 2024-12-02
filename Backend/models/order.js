@@ -65,7 +65,7 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
     image: {
-      type: Buffer,
+      type: String,
     },
     driver: {
       type: mongoose.Schema.Types.ObjectId,

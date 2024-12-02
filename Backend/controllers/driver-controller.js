@@ -7,17 +7,23 @@ import {
   HTTP_RESPONSE_CODE,
   ORDER_STATUS,
 } from "../constants/constant.js";
+import { s3, BUCKET_NAME } from "../config/AWS-S3-config.js";
+import sharp from "sharp";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { RequestValidation } from "../utils/request-validator.js";
 import { HttpException } from "../exceptions/exceptions.js";
+import { Types } from "mongoose";
 const { validationResult } = validator;
 
 export const authenticate = (req, res, next) => {
   try {
     if (!req.session.user) {
-      return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).send({
-        error: "user not allowed to perform this action, login to continue",
-        redirectUrl: "/login",
-      });
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.UNAUTHORIZED,
+        "user not allowed to perform this action, login to continue",
+        null,
+        { redirectUrl: "/login" }
+      );
     }
     next();
   } catch (error) {
@@ -31,7 +37,7 @@ export const register = async (req, res, next) => {
     if (!errors.isEmpty()) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
-        APP_ERROR_MESSAGE.invalidCredentials,
+        APP_ERROR_MESSAGE.invalidRequest,
         errors.errors
       );
     }
@@ -199,11 +205,59 @@ export const getDeliveriesInTransit = async (req, res, next) => {
   }
 };
 
+export const getDeliveriesDelivered = async (req, res, next) => {
+  try {
+    const driver = req.session.user;
+    const orders = await Order.find({
+      driver: driver._id,
+      status: ORDER_STATUS.delivered,
+    }).exec();
+
+    return res
+      .status(HTTP_RESPONSE_CODE.SUCCESS)
+      .send(
+        RequestValidation.createAPIResponse(
+          true,
+          HTTP_RESPONSE_CODE.SUCCESS,
+          APP_ERROR_MESSAGE.ordersReturned,
+          orders
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const completeDelivery = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        APP_ERROR_MESSAGE.invalidRequest,
+        errors.errors
+      );
+    }
+
     const { orderId } = req.params;
     const driver = req.session.user;
     const file = req.file;
+
+    if (Types.ObjectId.isValid(orderId)) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        APP_ERROR_MESSAGE.invalidOrderIdFormat,
+        `Expected a MongoID, got: ${orderId}`
+      );
+    }
+
+    const order = await Order.findById(orderId).exec();
+    if (!order) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.NOT_FOUND,
+        APP_ERROR_MESSAGE.orderNotFound
+      );
+    }
 
     if (!file) {
       throw new HttpException(
@@ -212,12 +266,28 @@ export const completeDelivery = async (req, res, next) => {
       );
     }
 
+    const convertedImage = await sharp(file.buffer)
+      .resize({ width: 800, height: 800, fit: "inside" })
+      .jpeg({ quality: 75 })
+      .toBuffer();
+
+    const filename = `${Date.now()}-${orderId}.jpg`;
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: `deliveries/${driver._id}/${filename}`,
+      Body: convertedImage,
+      ContentType: "image/jpeg",
+    };
+
+    const command = new PutObjectCommand(params);
+    await s3.send(command);
+
     const newOrder = await Order.findByIdAndUpdate(
       { _id: orderId, status: ORDER_STATUS.ready },
       {
         status: ORDER_STATUS.delivered,
         driver: driver._id,
-        image: file.buffer,
+        image: `deliveries/${driver._id}/${filename}`,
       },
       { new: true }
     ).exec();
