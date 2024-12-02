@@ -6,12 +6,14 @@ import DriverHome from "./pages/driver/DriverHome";
 import DriverRegister from "./pages/driver/DriverRegister";
 import DriverLogin from "./pages/driver/DriverLogin";
 import RestaurantRegister from "./pages/restaurant/RestaurantRegister";
+<<<<<<< HEAD
 import NewOrder from "./pages/restaurant/newOrder";
 import MyOrders from "./pages/restaurant/MyOrders";
+=======
 import OrderUpdatePage from "./pages/tracking/OrderUpdatePage";
 import MyOrdersPage from "./pages/driver/MyOrdersPage";
 import FulfillmentPage from "./pages/driver/FulfillmentPage";
-
+>>>>>>> fork/main
 
 const App = () => {
   return (
