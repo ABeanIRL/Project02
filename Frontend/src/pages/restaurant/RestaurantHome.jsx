@@ -2,6 +2,12 @@ import { useEffect, useState, useRef } from "react";
 //import HomepageMenuList from "../../components/HomepageMenuList";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import RestaurantFooter from "../../components/RestaurantFooter";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCustomer } from "../../slice/customerSlice";
+import MenuIcon from "@mui/icons-material/Menu";
+import AppBar from "@mui/material/AppBar";
+import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -18,6 +24,11 @@ const Menu = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerRef = useRef(null); // Reference to the header element
+const RestaurantHome = () => {
+  const user = useSelector((state) => state.customer.value);
+  const dispatch = useDispatch();
+  const [items, setItems] = useState([]);
+  console.log(user);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -306,4 +317,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default RestaurantHome;
