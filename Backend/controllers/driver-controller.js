@@ -123,6 +123,7 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = async (req, res) => {
+  req.session.user = null;
   req.session.destroy((err) => {
     if (err) {
       throw new HttpException();
@@ -134,7 +135,22 @@ export const logout = async (req, res) => {
 
 export const getDeliveriesReady = async (req, res, next) => {
   try {
-    const orders = await Order.find({ status: ORDER_STATUS.ready }).exec();
+    const orders = await Order.find({ status: ORDER_STATUS.ready })
+      .populate({
+        path: "items.menuItem",
+        select: "name price",
+      })
+      .sort({ createdAt: 1 })
+      .exec();
+
+    const ordersWithTotals = orders.map((order) => {
+      const total = order.total;
+      return {
+        ...order.toObject(),
+        total,
+      };
+    });
+
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
       .send(
@@ -142,7 +158,7 @@ export const getDeliveriesReady = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.ordersReturned,
-          orders
+          ordersWithTotals
         )
       );
   } catch (error) {
@@ -154,6 +170,15 @@ export const selectForDelivery = async (req, res, next) => {
   try {
     const { orderId } = req.params;
     const driver = req.session.user;
+
+    if (!Types.ObjectId.isValid(orderId)) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        APP_ERROR_MESSAGE.invalidOrderIdFormat,
+        `Expected a MongoID, got: ${orderId}`
+      );
+    }
+
     const newOrder = await Order.findByIdAndUpdate(
       { _id: orderId, status: ORDER_STATUS.ready },
       { status: ORDER_STATUS.transit, driver: driver._id },
@@ -188,7 +213,21 @@ export const getDeliveriesInTransit = async (req, res, next) => {
     const orders = await Order.find({
       driver: driver._id,
       status: ORDER_STATUS.transit,
-    }).exec();
+    })
+      .populate({
+        path: "items.menuItem",
+        select: "name price",
+      })
+      .sort({ createdAt: 1 })
+      .exec();
+
+    const ordersWithTotals = orders.map((order) => {
+      const total = order.total;
+      return {
+        ...order.toObject(),
+        total,
+      };
+    });
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
@@ -197,7 +236,7 @@ export const getDeliveriesInTransit = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.ordersReturned,
-          orders
+          ordersWithTotals
         )
       );
   } catch (error) {
@@ -211,7 +250,21 @@ export const getDeliveriesDelivered = async (req, res, next) => {
     const orders = await Order.find({
       driver: driver._id,
       status: ORDER_STATUS.delivered,
-    }).exec();
+    })
+      .populate({
+        path: "items.menuItem",
+        select: "name price",
+      })
+      .sort({ createdAt: 1 })
+      .exec();
+
+    const ordersWithTotals = orders.map((order) => {
+      const total = order.total;
+      return {
+        ...order.toObject(),
+        total,
+      };
+    });
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
@@ -220,7 +273,7 @@ export const getDeliveriesDelivered = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.ordersReturned,
-          orders
+          ordersWithTotals
         )
       );
   } catch (error) {
@@ -243,7 +296,7 @@ export const completeDelivery = async (req, res, next) => {
     const driver = req.session.user;
     const file = req.file;
 
-    if (Types.ObjectId.isValid(orderId)) {
+    if (!Types.ObjectId.isValid(orderId)) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
         APP_ERROR_MESSAGE.invalidOrderIdFormat,

@@ -27,9 +27,9 @@ router.post("/logout", logout);
 
 router.get("/deliveries/ready", authenticate, getDeliveriesReady);
 
-router.post("/deliveries/in-transit", authenticate, getDeliveriesInTransit);
+router.get("/deliveries/in-transit", authenticate, getDeliveriesInTransit);
 
-router.post("/deliveries/delivered", authenticate, getDeliveriesDelivered);
+router.get("/deliveries/delivered", authenticate, getDeliveriesDelivered);
 
 router.post("/delivery/:orderId/in-transit", selectForDelivery);
 

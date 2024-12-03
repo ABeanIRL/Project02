@@ -93,6 +93,7 @@ const DriverLogin = () => {
     try {
       const response = await fetch("http://localhost:3000/driver/login", {
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
@@ -102,7 +103,7 @@ const DriverLogin = () => {
         dispatch(setDriver(res.data));
         setEmail("");
         setPassword("");
-        navigate("/driver/");
+        navigate("/driver");
       }
     } catch (error) {
       console.error("Request failed:", error.message);

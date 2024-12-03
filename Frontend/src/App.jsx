@@ -6,6 +6,7 @@ import DriverHome from "./pages/driver/DriverHome";
 import DriverRegister from "./pages/driver/DriverRegister";
 import DriverLogin from "./pages/driver/DriverLogin";
 import RestaurantRegister from "./pages/restaurant/RestaurantRegister";
+// import NewOrder from "./pages/restaurant/NewOrder"
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <Route index element={<RestaurantHome />} />
           <Route path="login" element={<RestaurantLogin />} />
           <Route path="register" element={<RestaurantRegister />} />
+          {/* <Route path="order" element={<NewOrder />} /> */}
         </Route>
         <Route path="/driver">
           <Route index element={<DriverHome />} />
