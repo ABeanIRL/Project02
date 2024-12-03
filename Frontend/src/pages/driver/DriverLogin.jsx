@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
@@ -11,7 +11,7 @@ import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setDriver } from "../../slice/driverSlice.js";
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -62,6 +62,28 @@ const DriverLogin = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+  const driver = useSelector((state) => state.driver.user);
+
+  useEffect(() => {
+    const fetchDriverData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/driver/session", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          dispatch(setDriver({ user: res.data }));
+          navigate("/driver");
+        } else {
+          return;
+        }
+      } catch (error) {
+        console.error("Error fetching driver data:", error);
+      }
+    };
+    if (!driver) fetchDriverData();
+  }, [dispatch, driver, navigate]);
 
   const validateInputs = () => {
     let isValid = true;

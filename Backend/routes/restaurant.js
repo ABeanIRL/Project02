@@ -18,7 +18,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", getMenu);
+router.get("/menu", getMenu);
 
 router.post("/login", customerLogin, login);
 

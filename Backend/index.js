@@ -36,7 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.TOKEN_SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     store: redisStore,
     cookie: {

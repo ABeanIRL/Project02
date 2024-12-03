@@ -7,6 +7,7 @@ import DriverRegister from "./pages/driver/DriverRegister";
 import DriverLogin from "./pages/driver/DriverLogin";
 import RestaurantRegister from "./pages/restaurant/RestaurantRegister";
 // import NewOrder from "./pages/restaurant/NewOrder"
+import PrivateRoutes from "./routes/PrivateRoutes";
 
 const App = () => {
   return (
@@ -19,7 +20,14 @@ const App = () => {
           {/* <Route path="order" element={<NewOrder />} /> */}
         </Route>
         <Route path="/driver">
-          <Route index element={<DriverHome />} />
+          <Route
+            index
+            element={
+              <PrivateRoutes userType="driver">
+                <DriverHome />
+              </PrivateRoutes>
+            }
+          />
           <Route path="login" element={<DriverLogin />} />
           <Route path="register" element={<DriverRegister />} />
         </Route>

@@ -7,8 +7,12 @@ import { RequestValidation } from "../utils/request-validator.js";
 import {
   HTTP_RESPONSE_CODE,
   APP_ERROR_MESSAGE,
+  ORDER_STATUS,
 } from "../constants/constant.js";
 import { HttpException } from "../exceptions/exceptions.js";
+import { BUCKET_NAME, s3 } from "../config/AWS-S3-config.js";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { streamToBase64 } from "../utils/converter.js";
 const { validationResult } = validator;
 
 export const authenticate = (req, res, next) => {
@@ -176,7 +180,12 @@ export const createOrder = async (req, res, next) => {
 export const getOrderStatus = async (req, res, next) => {
   try {
     const { orderId } = req.body;
-    const order = await Order.find({ _id: orderId }).exec();
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "items.menuItem",
+        select: "name price",
+      })
+      .exec();
 
     if (!order) {
       throw new HttpException(
@@ -185,6 +194,37 @@ export const getOrderStatus = async (req, res, next) => {
       );
     }
 
+    const total = order.total;
+    const orderWithTotal = {
+      ...order.toObject(),
+      total,
+    };
+
+    if (order.status !== ORDER_STATUS.delivered) {
+      return res
+        .status(HTTP_RESPONSE_CODE.SUCCESS)
+        .send(
+          RequestValidation.createAPIResponse(
+            true,
+            HTTP_RESPONSE_CODE.SUCCESS,
+            APP_ERROR_MESSAGE.orderReturned,
+            orderWithTotal
+          )
+        );
+    }
+
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: order.image,
+    };
+
+    const command = new GetObjectCommand(params);
+    const data = await s3.send(command);
+    const content = await streamToBase64(data.Body);
+    const orderWithImage = {
+      ...orderWithTotal,
+      imageData: content,
+    };
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
       .send(
@@ -192,7 +232,7 @@ export const getOrderStatus = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.orderReturned,
-          order.status
+          orderWithImage
         )
       );
   } catch (error) {
