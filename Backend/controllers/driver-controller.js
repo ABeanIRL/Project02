@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
+import { Types } from "mongoose";
 import validator from "express-validator";
+import sharp from "sharp";
 import { Driver } from "../models/driver.js";
 import { Order } from "../models/order.js";
 import {
@@ -8,12 +10,31 @@ import {
   ORDER_STATUS,
 } from "../constants/constant.js";
 import { s3, BUCKET_NAME } from "../config/AWS-S3-config.js";
-import sharp from "sharp";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { streamToBase64 } from "../utils/converter.js";
+import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { RequestValidation } from "../utils/request-validator.js";
 import { HttpException } from "../exceptions/exceptions.js";
-import { Types } from "mongoose";
+
 const { validationResult } = validator;
+
+export const checkSession = (req, res, next) => {
+  try {
+    if (req.session.user) {
+      return res
+        .status(HTTP_RESPONSE_CODE.SUCCESS)
+        .send(
+          RequestValidation.createAPIResponse(
+            true,
+            HTTP_RESPONSE_CODE.SUCCESS,
+            APP_ERROR_MESSAGE.userReturned,
+            req.session.user
+          )
+        );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const authenticate = (req, res, next) => {
   try {
@@ -258,13 +279,25 @@ export const getDeliveriesDelivered = async (req, res, next) => {
       .sort({ createdAt: 1 })
       .exec();
 
-    const ordersWithTotals = orders.map((order) => {
-      const total = order.total;
-      return {
-        ...order.toObject(),
-        total,
-      };
-    });
+    const ordersWithTotals = await Promise.all(
+      orders.map(async (order) => {
+        const params = {
+          Bucket: BUCKET_NAME,
+          Key: order.image,
+        };
+
+        const command = new GetObjectCommand(params);
+        const data = await s3.send(command);
+        const content = await streamToBase64(data.Body);
+        const total = order.total;
+
+        return {
+          ...order.toObject(),
+          imageData: content,
+          total,
+        };
+      })
+    );
 
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   authenticate,
+  checkSession,
   register,
   login,
   logout,
@@ -18,6 +19,8 @@ import {
 import { upload } from "../utils/upload.js";
 
 const router = express.Router();
+
+router.get("/session", authenticate, checkSession);
 
 router.post("/register", driverRegister, register);
 

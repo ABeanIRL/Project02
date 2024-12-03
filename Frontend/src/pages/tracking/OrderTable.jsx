@@ -78,14 +78,29 @@ const OrderTable = ({ status, orders, onCancel }) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
+      <Paper
+        sx={{
+          width: "100%",
+          mb: 2,
+          backgroundColor: "#f9f9f9",
+          borderRadius: "10px",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          overflow: "hidden",
+        }}
+      >
         <Typography
           variant="h6"
           component="div"
           sx={{
             pl: { sm: 2 },
             pr: { xs: 1, sm: 1 },
-            pt: 1,
+            pt: 2,
+            pb: 1,
+            backgroundColor: "#d32f2f",
+            color: "#fff",
+            borderBottom: "2px solid #d32f2f",
+            fontWeight: "bold",
+            textAlign: "center",
           }}
         >
           Orders{" "}
@@ -93,11 +108,17 @@ const OrderTable = ({ status, orders, onCancel }) => {
             ? "In Transit"
             : status.charAt(0).toUpperCase() + status.slice(1)}
         </Typography>
-        <TableContainer>
+        <TableContainer
+          sx={{
+            backgroundColor: "#ffffff",
+            borderRadius: "0 0 10px 10px",
+            overflow: "hidden",
+          }}
+        >
           <Table size="medium">
             <TableHead>
               <TableRow>
-                <TableCell align="left">
+                <TableCell align="left" sx={{ width: 75 }}>
                   <IconButton
                     aria-label="collapse"
                     onClick={toggleExpandAll}
@@ -193,6 +214,22 @@ const OrderTable = ({ status, orders, onCancel }) => {
                               unmountOnExit
                             >
                               <Box sx={{ margin: 1 }}>
+                                {status === "delivered" && (
+                                  <Paper
+                                    component="img"
+                                    src={`data:image/jpeg;base64,${order.imageData}`}
+                                    alt={`Order ${order._id} Image`}
+                                    sx={{
+                                      maxWidth: "100%",
+                                      maxHeight: "300px",
+                                      objectFit: "contain",
+                                      display: "block",
+                                      margin: "0 auto",
+                                      borderRadius: "4px",
+                                      border: "1px solid #ccc",
+                                    }}
+                                  />
+                                )}
                                 <Typography variant="subtitle1">
                                   Order Items
                                 </Typography>

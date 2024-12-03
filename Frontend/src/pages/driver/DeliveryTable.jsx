@@ -15,6 +15,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import PropTypes from "prop-types";
+import UploadModal from "../../components/UploadModal";
 import React, { useMemo, useState } from "react";
 
 const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
@@ -22,6 +23,8 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [expandedRows, setExpandedRows] = useState({});
   const [expandAll, setExpandAll] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState(null);
 
   const handleDeliver = async (orderId) => {
     try {
@@ -50,27 +53,46 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
     setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleComplete = async (orderId) => {
+  const uploadImage = async (orderId, formData) => {
     try {
       const response = await fetch(
         `http://localhost:3000/driver/delivery/${orderId}/complete`,
         {
           method: "POST",
+          body: formData,
           credentials: "include",
         }
       );
 
-      if (response.ok) {
-        onComplete(orderId);
-      } else {
-        console.error(
-          `Failed to complete order with ID ${orderId}:`,
-          response.statusText
-        );
+      if (!response.ok) {
+        throw new Error("Upload failed.");
       }
+
+      onComplete(orderId);
     } catch (error) {
-      console.error(`Error completing order with ID ${orderId}:`, error);
+      console.error("Error uploading image:", error);
+      throw error;
     }
+  };
+
+  const handleClick = (order) => {
+    if (status === "ready") {
+      // If the status is "ready", start delivery
+      handleDeliver(order._id);
+    } else if (status === "transit") {
+      // If the status is "transit", open the modal to confirm completion
+      openCompleteModal(order);
+    }
+  };
+
+  const openCompleteModal = (order) => {
+    setCurrentOrder(order);
+    setOpenModal(true);
+  };
+
+  const closeModal = () => {
+    setOpenModal(false);
+    setCurrentOrder(null);
   };
 
   const toggleExpandAll = () => {
@@ -122,7 +144,7 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
           <Table size="medium">
             <TableHead>
               <TableRow>
-                <TableCell align="left">
+                <TableCell align="left" sx={{ width: 75 }}>
                   <IconButton
                     aria-label="collapse"
                     onClick={toggleExpandAll}
@@ -134,9 +156,6 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
                 <TableCell>ID</TableCell>
                 <TableCell align="right">Name</TableCell>
                 <TableCell align="right">Address</TableCell>
-                {["delivered"].includes(status) && (
-                  <TableCell align="right">Driver</TableCell>
-                )}
                 {["ready", "transit"].includes(status) && (
                   <TableCell align="center">Actions</TableCell>
                 )}
@@ -190,21 +209,14 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
                           <TableCell align="right">
                             {order.deliveryAddress}
                           </TableCell>
-                          {["delivered", "cancelled"].includes(status) && (
-                            <TableCell align="right">
-                              {order.driver || "None"}
-                            </TableCell>
-                          )}
                           {["ready", "transit"].includes(status) && (
                             <TableCell align="center">
                               <Button
                                 variant="contained"
-                                color={status === "ready" ? "primary" : "success"}
-                                onClick={() =>
-                                  status === "ready"
-                                    ? handleDeliver(order._id)
-                                    : handleComplete(order._id)
+                                color={
+                                  status === "ready" ? "primary" : "success"
                                 }
+                                onClick={() => handleClick(order)}
                               >
                                 {status === "ready" ? "Deliver" : "Complete"}
                               </Button>
@@ -222,6 +234,22 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
                               unmountOnExit
                             >
                               <Box sx={{ margin: 1 }}>
+                                {status === "delivered" && (
+                                  <Paper
+                                    component="img"
+                                    src={`data:image/jpeg;base64,${order.imageData}`}
+                                    alt={`Order ${order._id} Image`}
+                                    sx={{
+                                      maxWidth: "100%",
+                                      maxHeight: "300px",
+                                      objectFit: "contain",
+                                      display: "block",
+                                      margin: "0 auto",
+                                      borderRadius: "4px",
+                                      border: "1px solid #ccc",
+                                    }}
+                                  />
+                                )}
                                 <Typography variant="subtitle1">
                                   Order Items
                                 </Typography>
@@ -312,6 +340,13 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <UploadModal
+        order={currentOrder}
+        open={openModal}
+        onClose={closeModal}
+        onUpload={uploadImage}
+      />
     </Box>
   );
 };

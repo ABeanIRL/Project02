@@ -6,6 +6,7 @@ import MenuAppBar from "../../components/MenuAppBar";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import DeliveryTable from "./DeliveryTable.jsx";
+import { setDriver } from "../../slice/driverSlice.js";
 
 const DriverHome = () => {
   const navigate = useNavigate();
@@ -17,44 +18,58 @@ const DriverHome = () => {
     delivered: [],
   });
 
+  useEffect(() => {
+    const fetchDriverData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/driver/session", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const res = await response.json();
+          dispatch(setDriver(res.data));
+        } else {
+          navigate("/driver/login");
+        }
+      } catch (error) {
+        console.error("Error fetching driver data:", error);
+      }
+    };
+    if (!driver) fetchDriverData();
+  }, [dispatch, driver, navigate]);
+
+  useEffect(() => {
+    if (driver) {
+      const fetchOrders = async (status) => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/driver/deliveries/${
+              status === "transit" ? "in-transit" : status
+            }`,
+            { credentials: "include" }
+          );
+          if (response.ok) {
+            const res = await response.json();
+            setOrders((prev) => ({
+              ...prev,
+              [status]: res.data,
+            }));
+          } else {
+            console.error(response.statusText);
+          }
+        } catch (error) {
+          console.error(`Error fetching ${status} orders:`, error);
+        }
+      };
+      ["ready", "transit", "delivered"].forEach(fetchOrders);
+    }
+  }, [driver]);
+
   const onLogout = (event) => {
     event.preventDefault();
     dispatch(clearDriver());
     navigate("/driver/login");
   };
-
-  useEffect(() => {
-    if (!driver) {
-      navigate("/driver/login");
-    }
-  }, [driver, navigate]);
-
-  useEffect(() => {
-    const fetchOrders = async (status) => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/driver/deliveries/${
-            status === "transit" ? "in-transit" : status
-          }`,
-          {
-            credentials: "include",
-          }
-        );
-        if (response.ok) {
-          const res = await response.json();
-          setOrders((prev) => ({
-            ...prev,
-            [status]: res.data,
-          }));
-        } else {
-          console.error(response.statusText);
-        }
-      } catch (error) {
-        console.error(`Error fetching ${status} orders:`, error);
-      }
-    };
-    ["ready", "transit", "delivered"].forEach(fetchOrders);
-  }, []);
 
   const handleDeliverUpdate = (orderId) => {
     setOrders((prev) => {

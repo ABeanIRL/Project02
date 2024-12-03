@@ -14,10 +14,12 @@ const { validationResult } = validator;
 export const authenticate = (req, res, next) => {
   try {
     if (!req.session.user) {
-      return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).send({
-        error: "user not allowed to perform this action, login to continue",
-        redirectUrl: "/login",
-      });
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.UNAUTHORIZED,
+        "user not allowed to perform this action, login to continue",
+        null,
+        { redirectUrl: "/login" }
+      );
     }
     next();
   } catch (error) {
