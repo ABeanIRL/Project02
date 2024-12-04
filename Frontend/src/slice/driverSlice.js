@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const driverSlice = createSlice({
   name: "driver",
   initialState: {
-    user: null,
+    user: {},
     isAuthenticated: false,
     loading: false,
     error: null,
@@ -20,7 +20,7 @@ export const driverSlice = createSlice({
       }
     },
     clearDriver: (state) => {
-      state.user = null;
+      state.user = {};
       state.isAuthenticated = false;
     },
     setLoading: (state, action) => {

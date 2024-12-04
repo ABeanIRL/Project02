@@ -15,6 +15,25 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { streamToBase64 } from "../utils/converter.js";
 const { validationResult } = validator;
 
+export const checkSession = (req, res, next) => {
+  try {
+    if (req.session.user) {
+      return res
+        .status(HTTP_RESPONSE_CODE.SUCCESS)
+        .send(
+          RequestValidation.createAPIResponse(
+            true,
+            HTTP_RESPONSE_CODE.SUCCESS,
+            APP_ERROR_MESSAGE.userReturned,
+            req.session.user
+          )
+        );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const authenticate = (req, res, next) => {
   try {
     if (!req.session.user) {

@@ -1,57 +1,17 @@
 import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import MuiCard from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Link from "@mui/material/Link";
+import StyledLoginCard from "../../components/Login/StyledLoginCard";
+import StyledLoginContainer from "../../components/Login/StyledLoginContainer";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { styled } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { setDriver } from "../../slice/driverSlice.js";
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "600px",
-  maxWidth: "60%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const LoginContainer = styled(Stack)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing(2),
-  overflowY: "auto",
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
 
 const DriverLogin = () => {
   const navigate = useNavigate();
@@ -62,10 +22,10 @@ const DriverLogin = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-  const driver = useSelector((state) => state.driver.user);
+  const driver = useSelector((state) => state.driver);
 
   useEffect(() => {
-    const fetchDriverData = async () => {
+    const checkSession = async () => {
       try {
         const response = await fetch("http://localhost:3000/driver/session", {
           credentials: "include",
@@ -73,17 +33,22 @@ const DriverLogin = () => {
 
         if (response.ok) {
           const res = await response.json();
-          dispatch(setDriver({ user: res.data }));
-          navigate("/driver");
-        } else {
-          return;
+          if (res.data) {
+            dispatch(setDriver(res.data));
+            navigate("/driver");
+          }
         }
       } catch (error) {
-        console.error("Error fetching driver data:", error);
+        console.error("Error fetching session data:", error);
       }
     };
-    if (!driver) fetchDriverData();
-  }, [dispatch, driver, navigate]);
+
+    if (!driver.isAuthenticated) {
+      checkSession();
+    } else {
+      navigate("/driver");
+    }
+  }, [dispatch, driver.isAuthenticated, navigate]);
 
   const validateInputs = () => {
     let isValid = true;
@@ -133,8 +98,8 @@ const DriverLogin = () => {
   };
 
   return (
-    <LoginContainer direction="column" justifyContent="space-between">
-      <Card variant="outlined">
+    <StyledLoginContainer direction="column" justifyContent="space-between">
+      <StyledLoginCard variant="outlined">
         <Typography
           component="h1"
           variant="h4"
@@ -225,8 +190,8 @@ const DriverLogin = () => {
             </Box>
           </Box>
         </Box>
-      </Card>
-    </LoginContainer>
+      </StyledLoginCard>
+    </StyledLoginContainer>
   );
 };
 

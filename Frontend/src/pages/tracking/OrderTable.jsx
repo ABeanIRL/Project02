@@ -127,7 +127,7 @@ const OrderTable = ({ status, orders, onCancel }) => {
                     {!expandAll ? <KeyboardArrowUpIcon /> : <RemoveIcon />}
                   </IconButton>
                 </TableCell>
-                <TableCell>ID</TableCell>
+                <TableCell>Order ID</TableCell>
                 <TableCell align="right">Name</TableCell>
                 <TableCell align="right">Address</TableCell>
                 {["delivered", "cancelled"].includes(status) && (
@@ -178,7 +178,7 @@ const OrderTable = ({ status, orders, onCancel }) => {
                             </IconButton>
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {order.customerId}
+                            {order._id}
                           </TableCell>
                           <TableCell align="right">
                             {`${order.firstName} ${order.lastName}`}

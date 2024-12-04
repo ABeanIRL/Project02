@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const customerSlice = createSlice({
   name: "customer",
   initialState: {
+    user: {},
     isAuthenticated: false,
     loading: false,
     error: null,
@@ -19,7 +20,7 @@ export const customerSlice = createSlice({
       }
     },
     clearCustomer: (state) => {
-      state.user = null;
+      state.user = {};
       state.isAuthenticated = false;
     },
     setLoading: (state, action) => {

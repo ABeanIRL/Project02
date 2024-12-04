@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 const MenuAppBar = ({ user, onLogout }) => {
   const [auth, setAuth] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
