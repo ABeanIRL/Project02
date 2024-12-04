@@ -8,17 +8,20 @@ import {
   register,
   logout,
   authenticate,
+  checkSession,
 } from "../controllers/restaurant-controller.js";
 import {
   customerLogin,
   customerRegister,
   customerOrder,
-  customerOrderStatus
+  customerOrderStatus,
 } from "../middlewares/customer-validation.js";
 
 const router = express.Router();
 
 router.get("/menu", getMenu);
+
+router.get("/session", authenticate, checkSession);
 
 router.post("/login", customerLogin, login);
 

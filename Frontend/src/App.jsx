@@ -8,21 +8,14 @@ import DriverLogin from "./pages/driver/DriverLogin";
 import RestaurantRegister from "./pages/restaurant/RestaurantRegister";
 // import NewOrder from "./pages/restaurant/NewOrder"
 import DriverPrivateRoutes from "./routes/DriverPrivateRoutes";
-import RestaurantPrivateRoutes from "./routes/RestaurantPrivateRoutes";
+// import RestaurantPrivateRoutes from "./routes/RestaurantPrivateRoutes";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/restaurant">
-          <Route
-            index
-            element={
-              <RestaurantPrivateRoutes>
-                <RestaurantHome />
-              </RestaurantPrivateRoutes>
-            }
-          />
+          <Route index element={<RestaurantHome />} />
           <Route path="login" element={<RestaurantLogin />} />
           <Route path="register" element={<RestaurantRegister />} />
           {/* <Route path="order" element={<NewOrder />} /> */}
