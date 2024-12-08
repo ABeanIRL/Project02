@@ -21,13 +21,13 @@ const router = express.Router();
 
 router.get("/menu", getMenu);
 
-router.get("/session", authenticate, checkSession);
+router.get("/session", checkSession);
 
 router.post("/login", customerLogin, login);
 
 router.post("/register", customerRegister, register);
 
-router.post("/logout", logout);
+router.post("/logout", authenticate, logout);
 
 router.post("/order/status", customerOrderStatus, getOrderStatus);
 

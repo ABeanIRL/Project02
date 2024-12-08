@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { clearDriver } from "../../slice/driverSlice.js";
+import { logout } from "../../features/auth/driverSlice.js";
 import MenuAppBar from "../../components/MenuAppBar";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -10,7 +10,7 @@ import DeliveryTable from "./DeliveryTable.jsx";
 const DriverHome = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const driver = useSelector((state) => state.driver.user);
+  const driver = useSelector((state) => state.driver);
   const [orders, setOrders] = useState({
     ready: [],
     transit: [],
@@ -44,10 +44,19 @@ const DriverHome = () => {
     }
   }, [driver]);
 
-  const onLogout = (event) => {
-    event.preventDefault();
-    dispatch(clearDriver());
-    navigate("/driver/login");
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/driver/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        dispatch(logout());
+        navigate("/driver/login");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDeliverUpdate = (orderId) => {
@@ -91,7 +100,7 @@ const DriverHome = () => {
 
   return (
     <>
-      <MenuAppBar user={driver} onLogout={onLogout} />
+      <MenuAppBar user={driver.userInfo} handleLogout={handleLogout} />
       <Container>
         <Box sx={{ "&>*": { mb: 6, mt: 6 } }}>
           {Object.entries(orders).map(([status, orderList]) => (

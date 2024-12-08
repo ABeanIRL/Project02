@@ -20,13 +20,13 @@ import { upload } from "../utils/upload.js";
 
 const router = express.Router();
 
-router.get("/session", authenticate, checkSession);
+router.get("/session", checkSession);
 
 router.post("/register", driverRegister, register);
 
 router.post("/login", driverLogin, login);
 
-router.post("/logout", logout);
+router.post("/logout", authenticate, logout);
 
 router.get("/deliveries/ready", authenticate, getDeliveriesReady);
 

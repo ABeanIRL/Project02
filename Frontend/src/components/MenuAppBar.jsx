@@ -8,11 +8,11 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const MenuAppBar = ({ user, onLogout }) => {
-  const [auth, setAuth] = useState(false);
+const MenuAppBar = ({ user, handleLogout }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -20,12 +20,6 @@ const MenuAppBar = ({ user, onLogout }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  useEffect(() => {
-    if (user) {
-      setAuth(true);
-    }
-  }, [user]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -43,7 +37,7 @@ const MenuAppBar = ({ user, onLogout }) => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Dashboard
           </Typography>
-          {auth && (
+          {user && (
             <div>
               <IconButton
                 size="large"
@@ -72,7 +66,7 @@ const MenuAppBar = ({ user, onLogout }) => {
               >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                 <MenuItem onClick={handleClose}>My account</MenuItem>
-                <MenuItem onClick={onLogout}>Logout</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>
           )}
@@ -83,7 +77,7 @@ const MenuAppBar = ({ user, onLogout }) => {
 };
 
 MenuAppBar.propTypes = {
-  onLogout: PropTypes.func.isRequired,
+  handleLogout: PropTypes.func.isRequired,
   user: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,

@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import customerReducer from "../slice/customerSlice.js";
-import driverReudcer from "../slice/driverSlice.js";
+import customerReducer from "../features/auth/customerSlice.js";
+import driverReudcer from "../features/auth/driverSlice.js"
 
 export default configureStore({
   reducer: {

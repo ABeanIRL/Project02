@@ -28,6 +28,19 @@ export const checkSession = (req, res, next) => {
             req.session.user
           )
         );
+    } else {
+      if (req.session.user) {
+        return res
+          .status(HTTP_RESPONSE_CODE.SUCCESS)
+          .send(
+            RequestValidation.createAPIResponse(
+              true,
+              HTTP_RESPONSE_CODE.SUCCESS,
+              "No valid session",
+              null
+            )
+          );
+      }
     }
   } catch (error) {
     next(error);
@@ -62,14 +75,14 @@ export const login = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
-    const user = await Customer.findOne({ email }).exec();
-    if (!user) {
+    const customer = await Customer.findOne({ email }).exec();
+    if (!customer) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
         APP_ERROR_MESSAGE.invalidCredentials
       );
     }
-    const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, customer.password);
     if (!match) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.BAD_REQUEST,
@@ -77,8 +90,8 @@ export const login = async (req, res, next) => {
       );
     }
     // eslint-disable-next-line no-unused-vars
-    const { password: _, ...userInfo } = user.toObject();
-    req.session.user = userInfo;
+    const { password: _, ...customerInfo } = customer.toObject();
+    req.session.user = customerInfo;
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
       .send(
@@ -86,7 +99,7 @@ export const login = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.userReturned,
-          userInfo
+          customerInfo
         )
       );
   } catch (error) {
@@ -139,13 +152,17 @@ export const register = async (req, res, next) => {
 };
 
 export const logout = async (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      throw new HttpException();
-    } else {
-      res.status(200);
-    }
-  });
+  req.session.destroy();
+  return res
+    .status(HTTP_RESPONSE_CODE.SUCCESS)
+    .send(
+      RequestValidation.createAPIResponse(
+        true,
+        HTTP_RESPONSE_CODE.SUCCESS,
+        "User logged out",
+        null
+      )
+    );
 };
 
 export const getMenu = async (req, res, next) => {
@@ -170,6 +187,7 @@ export const createOrder = async (req, res, next) => {
   try {
     const { customerId, firstName, lastName, deliveryAddress, items } =
       req.body;
+    console.log(req.body)
     const order = Order({
       customerId: customerId.trim(),
       firstName: firstName.trim(),
@@ -192,6 +210,7 @@ export const createOrder = async (req, res, next) => {
         )
       );
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

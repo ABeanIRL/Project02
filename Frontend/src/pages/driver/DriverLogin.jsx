@@ -6,12 +6,12 @@ import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Link from "@mui/material/Link";
-import StyledLoginCard from "../../components/Login/StyledLoginCard";
-import StyledLoginContainer from "../../components/Login/StyledLoginContainer";
+import StyledCard from "../../components/Card/StyledCard";
+import StyledContainer from "../../components/Container/StyledContainer";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setDriver } from "../../slice/driverSlice.js";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../features/auth/driverSlice.js";
 
 const DriverLogin = () => {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ const DriverLogin = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-  const driver = useSelector((state) => state.driver);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -30,25 +29,18 @@ const DriverLogin = () => {
         const response = await fetch("http://localhost:3000/driver/session", {
           credentials: "include",
         });
-
-        if (response.ok) {
-          const res = await response.json();
-          if (res.data) {
-            dispatch(setDriver(res.data));
-            navigate("/driver");
-          }
+        const res = await response.json();
+        if (res.data) {
+          dispatch(setCredentials(res.data));
+          navigate("/driver");
         }
       } catch (error) {
+        localStorage.removeItem("driverUser");
         console.error("Error fetching session data:", error);
       }
     };
-
-    if (!driver.isAuthenticated) {
-      checkSession();
-    } else {
-      navigate("/driver");
-    }
-  }, [dispatch, driver.isAuthenticated, navigate]);
+    checkSession();
+  }, []);
 
   const validateInputs = () => {
     let isValid = true;
@@ -74,9 +66,7 @@ const DriverLogin = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validateInputs()) {
-      return;
-    }
+    if (!validateInputs()) return;
     try {
       const response = await fetch("http://localhost:3000/driver/login", {
         headers: { "Content-Type": "application/json" },
@@ -85,12 +75,14 @@ const DriverLogin = () => {
         body: JSON.stringify({ email, password }),
       });
 
+      const res = await response.json();
       if (response.ok) {
-        const res = await response.json();
-        dispatch(setDriver(res.data));
-        setEmail("");
-        setPassword("");
+        dispatch(setCredentials(res.data));
         navigate("/driver");
+      } else {
+        setEmailError(true);
+        setPasswordError(true);
+        setPasswordErrorMessage(res.message);
       }
     } catch (error) {
       console.error("Request failed:", error.message);
@@ -98,8 +90,8 @@ const DriverLogin = () => {
   };
 
   return (
-    <StyledLoginContainer direction="column" justifyContent="space-between">
-      <StyledLoginCard variant="outlined">
+    <StyledContainer direction="column" justifyContent="space-between">
+      <StyledCard variant="outlined">
         <Typography
           component="h1"
           variant="h4"
@@ -190,8 +182,8 @@ const DriverLogin = () => {
             </Box>
           </Box>
         </Box>
-      </StyledLoginCard>
-    </StyledLoginContainer>
+      </StyledCard>
+    </StyledContainer>
   );
 };
 

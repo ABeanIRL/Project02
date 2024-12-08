@@ -1,20 +1,19 @@
-import MenuIcon from "@mui/icons-material/Menu";
 import AppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
-import { IconButton, MenuItem, Link, Menu, Fade } from "@mui/material";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MenuIcon from "@mui/icons-material/Menu";
+import Fade from "@mui/material/Fade";
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { clearCustomer } from "../slice/customerSlice";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
-const RestaurantHeader = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const RestaurantHeader = ({ user, handleLogout }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const customer = useSelector((state) => state.customer.value);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -22,23 +21,6 @@ const RestaurantHeader = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/restaurant/logout", {
-        method: "POST",
-      });
-      const res = response.json();
-      if (response.ok) {
-        dispatch(clearCustomer());
-        navigate("/restaurant");
-      } else {
-        console.error("Failed to logout", res.error);
-      }
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   return (
@@ -64,17 +46,17 @@ const RestaurantHeader = () => {
         >
           Gustosa
         </Typography>
-        {customer ? (
+        {!user ? (
           <>
-            <Button color="inherit" href="/restaurant/register">
+            <Button component={Link} color="inherit" to="/restaurant/register">
               Register
             </Button>
-            <Button color="inherit" href="/restaurant/login">
+            <Button component={Link} color="inherit" to="/restaurant/login">
               Login
             </Button>
           </>
         ) : (
-          <Button color="inherit" onClick={handleLogout}>
+          <Button color="inherit" onClick={() => handleLogout()}>
             Logout
           </Button>
         )}
@@ -89,24 +71,34 @@ const RestaurantHeader = () => {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        <MenuItem onClick={handleClose}>
-          <Link href="/restaurant" underline="none">
-            Home
-          </Link>
+        <MenuItem component={Link} to="/restaurant" onClick={handleClose}>
+          Home
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link href="/restaurant/order" underline="none">
-            New Order
-          </Link>
+        <MenuItem component={Link} to="/restaurant/order" onClick={handleClose}>
+          New Order
         </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link href="/restaurant/myOrders" underline="none">
-            My Orders
-          </Link>
+        <MenuItem
+          component={Link}
+          to="/restaurant/my-order"
+          onClick={handleClose}
+        >
+          My Orders
         </MenuItem>
       </Menu>
     </AppBar>
   );
+};
+
+RestaurantHeader.propTypes = {
+  handleLogout: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+  }),
 };
 
 export default RestaurantHeader;

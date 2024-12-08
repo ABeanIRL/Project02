@@ -6,12 +6,12 @@ import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Link from "@mui/material/Link";
-import StyledLoginCard from "../../components/Login/StyledLoginCard";
-import StyledLoginContainer from "../../components/Login/StyledLoginContainer";
+import StyledCard from "../../components/Card/StyledCard";
+import StyledContainer from "../../components/Container/StyledContainer";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setCustomer } from "../../slice/customerSlice.js";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../features/auth/customerSlice.js";
 
 const RestaurantLogin = () => {
   const navigate = useNavigate();
@@ -22,33 +22,28 @@ const RestaurantLogin = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-  const customer = useSelector((state) => state.customer);
 
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch("http://localhost:3000/driver/session", {
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const res = await response.json();
-          if (res.data) {
-            dispatch(setCustomer(res.data));
-            navigate("/restaraunt");
+        const response = await fetch(
+          "http://localhost:3000/restaurant/session",
+          {
+            credentials: "include",
           }
+        );
+        const res = await response.json();
+        if (res.data) {
+          dispatch(setCredentials(res.data));
+          navigate("/restaurant");
         }
       } catch (error) {
+        localStorage.removeItem("customerUser");
         console.error("Error fetching session data:", error);
       }
     };
-
-    if (!customer.isAuthenticated) {
-      checkSession();
-    } else {
-      navigate("/restaurant");
-    }
-  }, [dispatch, customer.isAuthenticated, navigate]);
+    checkSession();
+  }, []);
 
   const validateInputs = () => {
     let isValid = true;
@@ -74,22 +69,23 @@ const RestaurantLogin = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validateInputs()) {
-      return;
-    }
+    if (!validateInputs()) return;
     try {
       const response = await fetch("http://localhost:3000/restaurant/login", {
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
 
+      const res = await response.json();
       if (response.ok) {
-        const res = response.json();
-        dispatch(setCustomer(res.data));
-        setEmail("");
-        setPassword("");
+        dispatch(setCredentials(res.data));
         navigate("/restaurant");
+      } else {
+        setEmailError(true);
+        setPasswordError(true);
+        setPasswordErrorMessage(res.message);
       }
     } catch (error) {
       console.error("Request failed:", error.message);
@@ -97,10 +93,10 @@ const RestaurantLogin = () => {
   };
 
   return (
-    <StyledLoginContainer
+    <StyledContainer
       sx={{ direction: "column", justifyContent: "space-between" }}
     >
-      <StyledLoginCard variant="outlined">
+      <StyledCard variant="outlined">
         <Typography
           component="h1"
           variant="h4"
@@ -190,8 +186,8 @@ const RestaurantLogin = () => {
             </Box>
           </Box>
         </Box>
-      </StyledLoginCard>
-    </StyledLoginContainer>
+      </StyledCard>
+    </StyledContainer>
   );
 };
 

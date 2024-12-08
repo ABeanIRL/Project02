@@ -1,55 +1,14 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import MuiCard from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Link from "@mui/material/Link";
-import { Link as RouterLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { styled } from "@mui/material";
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "600px",
-  maxWidth: "60%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const RegisterContainer = styled(Stack)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing(2),
-  overflowY: "auto",
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import StyledCard from "../../components/Card/StyledCard";
+import StyledContainer from "../../components/Container/StyledContainer";
 
 const DriverRegister = () => {
   const navigate = useNavigate();
@@ -203,9 +162,7 @@ const DriverRegister = () => {
     event.preventDefault();
     const newErrors = validateInputs();
     setErrors(newErrors);
-    if (Object.values(newErrors).some((e) => e.error)) {
-      return;
-    }
+    if (Object.values(newErrors).some((e) => e.error)) return;
     try {
       const response = await fetch("http://localhost:3000/driver/register", {
         headers: { "Content-Type": "application/json" },
@@ -213,19 +170,15 @@ const DriverRegister = () => {
         body: JSON.stringify(formData),
       });
 
+      const res = await response.json();
       if (response.ok) {
-        setFormData({
-          username: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-          firstName: "",
-          lastName: "",
-          vehicleModel: "",
-          modelColor: "",
-          licensePlate: "",
-        });
         navigate("/driver/login");
+      } else {
+        const updatedErrors = { ...errors };
+        res.error.forEach((e) => {
+          updatedErrors[e.path] = { error: true, message: e.msg };
+        });
+        setErrors(updatedErrors);
       }
     } catch (error) {
       console.error("Request failed:", error.message);
@@ -233,10 +186,10 @@ const DriverRegister = () => {
   };
 
   return (
-    <RegisterContainer
+    <StyledContainer
       sx={{ direction: "column", justifyContent: "space-between" }}
     >
-      <Card variant="outlined">
+      <StyledCard variant="outlined">
         <Typography
           component="h1"
           variant="h4"
@@ -272,7 +225,6 @@ const DriverRegister = () => {
                 id="username"
                 type="text"
                 name="username"
-                placeholder="Username..."
                 autoComplete="username"
                 required
                 fullWidth
@@ -290,7 +242,6 @@ const DriverRegister = () => {
                 id="email"
                 type="email"
                 name="email"
-                placeholder="your@email.com"
                 autoComplete="email"
                 required
                 fullWidth
@@ -308,7 +259,6 @@ const DriverRegister = () => {
                 id="password"
                 type="password"
                 name="password"
-                placeholder="Password..."
                 autoComplete="password"
                 required
                 fullWidth
@@ -326,7 +276,6 @@ const DriverRegister = () => {
                 id="confirmPassword"
                 type="password"
                 name="confirmPassword"
-                placeholder="Confirm password..."
                 autoComplete="confirm-password"
                 required
                 fullWidth
@@ -362,7 +311,6 @@ const DriverRegister = () => {
                 id="lastName"
                 type="text"
                 name="lastName"
-                placeholder="Last name..."
                 autoComplete="last-name"
                 required
                 fullWidth
@@ -380,7 +328,6 @@ const DriverRegister = () => {
                 id="vehicleModel"
                 type="text"
                 name="vehicleModel"
-                placeholder="Vehicle model..."
                 autoComplete="vehicle-model"
                 fullWidth
                 variant="outlined"
@@ -397,7 +344,6 @@ const DriverRegister = () => {
                 id="modelColor"
                 type="text"
                 name="modelColor"
-                placeholder="Model color..."
                 autoComplete="model-color"
                 fullWidth
                 variant="outlined"
@@ -414,7 +360,6 @@ const DriverRegister = () => {
                 id="licensePlate"
                 type="text"
                 name="licensePlate"
-                placeholder="License plate..."
                 autoComplete="license-plate"
                 fullWidth
                 variant="outlined"
@@ -449,8 +394,8 @@ const DriverRegister = () => {
             </Box>
           </Box>
         </Box>
-      </Card>
-    </RegisterContainer>
+      </StyledCard>
+    </StyledContainer>
   );
 };
 

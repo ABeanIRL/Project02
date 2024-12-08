@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import RestaurantFooter from "../../components/RestaurantFooter";
 import Typography from "@mui/material/Typography";
@@ -11,11 +13,15 @@ import gnocchiPhoto1 from "../../assets/gnocchi.jpg";
 import fettucciniPhoto1 from "../../assets/fettuccini.jpg";
 import tortelliniPhoto1 from "../../assets/tortellini.jpg";
 import chefPhoto1 from "../../assets/chef.jpg";
+import { logout, setCredentials } from "../../features/auth/customerSlice";
 
 const Menu = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [isSticky, setIsSticky] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const headerRef = useRef(null); // Reference to the header element
+  const headerRef = useRef(null);
+  const customer = useSelector((state) => state.customer);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +47,44 @@ const Menu = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/restaurant/session",
+          {
+            credentials: "include",
+          }
+        );
+        const res = await response.json();
+        if (res.data) {
+          dispatch(setCredentials(res.data));
+        } else {
+          dispatch(logout());
+        }
+        // eslint-disable-next-line no-unused-vars
+      } catch (error) {
+        localStorage.removeItem("customerUser");
+      }
+    };
+    checkSession();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/restaurant/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        dispatch(logout());
+        navigate("/restaurant");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -51,7 +95,7 @@ const Menu = () => {
       <Box
         sx={{
           height: "100vh",
-          backgroundImage: `url(${heroPhoto1})`, // Update this line
+          backgroundImage: `url(${heroPhoto1})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           position: "relative",
@@ -60,7 +104,7 @@ const Menu = () => {
       >
         <Box
           sx={{
-            backgroundColor: "rgba(139,0,0,0.5)", // Dark red overlay
+            backgroundColor: "rgba(139,0,0,0.5)",
             width: "100%",
             height: "100%",
             display: "flex",
@@ -79,10 +123,8 @@ const Menu = () => {
           </Typography>
         </Box>
       </Box>
-
       {/* //end of hero page */}
 
-      {/* sticky header */}
       {/* Sticky Header */}
       <Box
         id="header"
@@ -98,7 +140,10 @@ const Menu = () => {
           boxShadow: isSticky ? "0px 4px 6px rgba(0, 0, 0, 0.1)" : "none",
         }}
       >
-        <RestaurantHeader />
+        <RestaurantHeader
+          user={customer.userInfo}
+          handleLogout={handleLogout}
+        />
       </Box>
 
       {isSticky && <Box sx={{ minHeight: `${headerHeight}px` }}></Box>}
@@ -227,6 +272,7 @@ const Menu = () => {
           Ready to Experience Authentic Italian Cuisine?
         </Typography>
         <Button
+          component={Link}
           variant="contained"
           sx={{
             marginTop: "1rem",
@@ -234,7 +280,7 @@ const Menu = () => {
             color: "darkred",
             "&:hover": { backgroundColor: "#ffe6e6", color: "darkred" },
           }}
-          href="/restaurant/order"
+          to="/restaurant/order"
         >
           Order Now
         </Button>
@@ -290,13 +336,13 @@ const Menu = () => {
               Giuseppe Di Stefano was born in the heart of Rome. He grew up
               surrounded by the sights, sounds, and smells of his family&apos;s
               restaurant, where he learned to cook from his grandmother, Nonna
-              Maria. Giuseppe&apos;s passion for food and cooking led him to study at
-              the prestigious Culinary Institute of Italy, where he honed his
-              skills in the art of pasta-making. After working in some of the
-              finest restaurants in Rome, Giuseppe moved to Toronto to share his
-              love of Italian cuisine with the world. Today, he is the head chef
-              at Gustosa, where he creates delicious dishes that transport
-              diners to the streets of Rome with every bite.
+              Maria. Giuseppe&apos;s passion for food and cooking led him to
+              study at the prestigious Culinary Institute of Italy, where he
+              honed his skills in the art of pasta-making. After working in some
+              of the finest restaurants in Rome, Giuseppe moved to Toronto to
+              share his love of Italian cuisine with the world. Today, he is the
+              head chef at Gustosa, where he creates delicious dishes that
+              transport diners to the streets of Rome with every bite.
             </Typography>
           </Grid>
         </Grid>

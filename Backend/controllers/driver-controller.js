@@ -30,6 +30,17 @@ export const checkSession = (req, res, next) => {
             req.session.user
           )
         );
+    } else {
+      return res
+        .status(HTTP_RESPONSE_CODE.SUCCESS)
+        .send(
+          RequestValidation.createAPIResponse(
+            true,
+            HTTP_RESPONSE_CODE.SUCCESS,
+            "No valid session",
+            null
+          )
+        );
     }
   } catch (error) {
     next(error);
@@ -118,6 +129,12 @@ export const login = async (req, res, next) => {
 
     const { email, password } = req.body;
     const driver = await Driver.findOne({ email }).exec();
+    if (!driver) {
+      throw new HttpException(
+        HTTP_RESPONSE_CODE.BAD_REQUEST,
+        APP_ERROR_MESSAGE.invalidCredentials
+      );
+    }
     const match = await bcrypt.compare(password, driver.password);
     if (!match) {
       throw new HttpException(
@@ -144,14 +161,17 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = async (req, res) => {
-  req.session.user = null;
-  req.session.destroy((err) => {
-    if (err) {
-      throw new HttpException();
-    } else {
-      res.status(200);
-    }
-  });
+  req.session.destroy();
+  return res
+    .status(HTTP_RESPONSE_CODE.SUCCESS)
+    .send(
+      RequestValidation.createAPIResponse(
+        true,
+        HTTP_RESPONSE_CODE.SUCCESS,
+        "User logged out",
+        null
+      )
+    );
 };
 
 export const getDeliveriesReady = async (req, res, next) => {

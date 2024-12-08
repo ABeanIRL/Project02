@@ -1,7 +1,7 @@
 import { styled } from "@mui/material";
 import Stack from "@mui/material/Stack";
 
-const StyledLoginContainer = styled(Stack)(({ theme }) => ({
+const StyledContainer = styled(Stack)(({ theme }) => ({
   padding: theme.spacing(2),
   display: "flex",
   flexDirection: "column",
@@ -23,4 +23,4 @@ const StyledLoginContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default StyledLoginContainer;
+export default StyledContainer;
