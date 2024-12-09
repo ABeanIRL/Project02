@@ -51,6 +51,7 @@ export const getTransitOrders = async (req, res, next) => {
         path: "items.menuItem",
         select: "name price",
       })
+      .populate("driver", "firstName lastName email")
       .sort({ createdAt: -1 })
       .exec();
 

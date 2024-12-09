@@ -18,7 +18,9 @@ import PropTypes from "prop-types";
 import UploadModal from "../../components/UploadModal";
 import React, { useMemo, useState } from "react";
 
+// Component to display the delivery table
 const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
+  // State variables
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [expandedRows, setExpandedRows] = useState({});
@@ -26,6 +28,7 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
   const [openModal, setOpenModal] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
 
+  // Function to handle delivery action
   const handleDeliver = async (orderId) => {
     try {
       const response = await fetch(
@@ -49,10 +52,12 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
     }
   };
 
+  // Function to toggle row expansion
   const toggleRow = (id) => {
     setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  // Function to upload image for order completion
   const uploadImage = async (orderId, formData) => {
     try {
       const response = await fetch(
@@ -75,26 +80,28 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
     }
   };
 
+  // Function to handle click action based on status
   const handleClick = (order) => {
     if (status === "ready") {
-      // If the status is "ready", start delivery
       handleDeliver(order._id);
     } else if (status === "transit") {
-      // If the status is "transit", open the modal to confirm completion
       openCompleteModal(order);
     }
   };
 
+  // Function to open the completion modal
   const openCompleteModal = (order) => {
     setCurrentOrder(order);
     setOpenModal(true);
   };
 
+  // Function to close the modal
   const closeModal = () => {
     setOpenModal(false);
     setCurrentOrder(null);
   };
 
+  // Function to toggle expand all rows
   const toggleExpandAll = () => {
     setExpandAll(!expandAll);
     setExpandedRows(() =>
@@ -105,18 +112,22 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
     );
   };
 
+  // Function to handle page change
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Function to handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 5));
     setPage(0);
   };
 
+  // Calculate empty rows for pagination
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - orders.length) : 0;
 
+  // Memoize visible rows for performance optimization
   const visibleRows = useMemo(
     () =>
       [...orders].slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
@@ -137,7 +148,7 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
         >
           Orders{" "}
           {status === "transit"
-            ? "In Transit"
+            ? "Being Delivered By You"
             : status.charAt(0).toUpperCase() + status.slice(1)}
         </Typography>
         <TableContainer>
@@ -186,6 +197,7 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
                             },
                           }}
                         >
+                          {/* pretty sure what you need to make the driver details display is in here */}
                           <TableCell>
                             <IconButton
                               aria-label="expand row"
@@ -351,6 +363,7 @@ const DeliveryTable = ({ status, orders, onDeliver, onComplete }) => {
   );
 };
 
+// PropTypes validation
 DeliveryTable.propTypes = {
   status: PropTypes.oneOf(["ready", "transit", "delivered", "cancelled"])
     .isRequired,

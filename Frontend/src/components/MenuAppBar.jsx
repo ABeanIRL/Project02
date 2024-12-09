@@ -25,15 +25,7 @@ const MenuAppBar = ({ user, handleLogout }) => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Dashboard
           </Typography>
@@ -64,8 +56,6 @@ const MenuAppBar = ({ user, handleLogout }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>

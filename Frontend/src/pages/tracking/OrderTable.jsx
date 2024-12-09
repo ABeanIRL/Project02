@@ -230,10 +230,20 @@ const OrderTable = ({ status, orders, onCancel }) => {
                                     }}
                                   />
                                 )}
+                                {status === "transit" && (
+                                  <Typography variant="subtitle1">
+                                    Assigned Driver: {order.driver.firstName} {order.driver.lastName}
+                                  </Typography>
+                                )}
+                                                                {status === "delivered" && (
+                                  <Typography variant="subtitle1">
+                                    Assigned Driver: {order.driver.firstName} {order.driver.lastName}
+                                  </Typography>
+                                )}
                                 <Typography variant="subtitle1">
                                   Order Items
                                 </Typography>
-                                <Table size="small">
+                                <Table size="small" name="OrderItemsTable">
                                   <TableHead>
                                     <TableRow>
                                       <TableCell>Item</TableCell>

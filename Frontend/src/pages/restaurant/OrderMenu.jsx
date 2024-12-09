@@ -190,6 +190,7 @@ const OrderMenu = () => {
                     type="number"
                     aria-label="Quantity"
                     placeholder="How many?"
+                    min="0"
                     value={quantities[item._id] || 0}
                     onChange={(event) =>
                       handleQuantityChange(
