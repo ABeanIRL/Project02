@@ -222,6 +222,9 @@ const OrderStatus = () => {
                     <strong>Your driver picked up your meal </strong>{" "}
                     {formatDate(orderDetails.updatedAt)}
                   </Typography>
+                  <Typography variant="body1" color="black">
+                    {orderDetails.driver.firstName} will deliver your meal in a {orderDetails.driver.modelColor} {orderDetails.driver.vehicleModel} with license plate {orderDetails.driver.licensePlate}.
+                  </Typography>
                 </div>
               )}
 
@@ -231,6 +234,9 @@ const OrderStatus = () => {
                   <Typography variant="body1" color="green">
                     <strong>Your meal was delivered </strong>{" "}
                     {formatDate(orderDetails.updatedAt)}
+                  </Typography>
+                  <Typography variant="body1" color="black">
+                    {orderDetails.driver.firstName} delivered your meal in a {orderDetails.driver.modelColor} {orderDetails.driver.vehicleModel} with license plate {orderDetails.driver.licensePlate}.
                   </Typography>
                   <Paper
                     component="img"

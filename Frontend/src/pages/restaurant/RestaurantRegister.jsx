@@ -141,7 +141,7 @@ const RestaurantRegister = () => {
     setErrors(newErrors);
     if (Object.values(newErrors).some((e) => e.error)) return;
     try {
-      const response = await fetch("http://localhost:3000/driver/register", {
+      const response = await fetch("http://localhost:3000/restaurant/register", {
         headers: { "Content-Type": "application/json" },
         method: "POST",
         body: JSON.stringify(formData),

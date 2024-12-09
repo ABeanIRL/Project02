@@ -74,7 +74,9 @@ export const login = async (req, res, next) => {
       );
     }
 
-    const { email, password } = req.body;
+    //let {}
+    let { email, password } = req.body;
+    email = email.toLowerCase();
     const customer = await Customer.findOne({ email }).exec();
     if (!customer) {
       throw new HttpException(
@@ -134,8 +136,7 @@ export const register = async (req, res, next) => {
     if (!user) {
       throw new HttpException();
     }
-    // eslint-disable-next-line no-unused-vars
-    const { password: _, ...userInfo } = user.toObject();
+
     return res
       .status(HTTP_RESPONSE_CODE.SUCCESS)
       .send(
@@ -143,7 +144,7 @@ export const register = async (req, res, next) => {
           true,
           HTTP_RESPONSE_CODE.SUCCESS,
           APP_ERROR_MESSAGE.createdUser,
-          userInfo
+          user
         )
       );
   } catch (error) {
@@ -187,7 +188,6 @@ export const createOrder = async (req, res, next) => {
   try {
     const { customerId, firstName, lastName, deliveryAddress, items } =
       req.body;
-    console.log(req.body)
     const order = Order({
       customerId: customerId.trim(),
       firstName: firstName.trim(),
@@ -210,7 +210,6 @@ export const createOrder = async (req, res, next) => {
         )
       );
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -225,11 +224,17 @@ export const getOrderStatus = async (req, res, next) => {
       })
       .exec();
 
+
     if (!order) {
       throw new HttpException(
         HTTP_RESPONSE_CODE.NOT_FOUND,
         APP_ERROR_MESSAGE.orderNotFound
       );
+    }
+
+    // IMPOERATNT
+    if (order && order.driver) {
+      await order.populate("driver", "firstName lastName email vehicleModel modelColor licensePlate")
     }
 
     const total = order.total;
